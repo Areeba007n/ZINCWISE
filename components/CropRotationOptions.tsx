@@ -1,0 +1,4 @@
+import { RefreshCw, Sprout } from "lucide-react";
+import type { District } from "@/lib/types";
+import { Panel, StatusChip } from "./ui";
+export function CropRotationOptions({ district }: { district: District }) { return <Panel className="rotation-panel" label="Crop rotation options"><div className="panel-heading"><span className="heading-icon rotate"><RefreshCw /></span><h2>Crop Rotation Options</h2></div><div className="rotation-list">{district.rotations.map((rotation) => <article className={`rotation ${rotation.tag === "Recommended" ? "recommended" : ""}`} key={rotation.name}><span className="rotation-icon"><Sprout size={26}/></span><div><h3>{rotation.name}</h3><p>{rotation.description}</p></div><StatusChip tone={rotation.tag === "Recommended" ? "low" : "neutral"}>{rotation.tag}</StatusChip></article>)}</div></Panel>; }
