@@ -14,14 +14,11 @@ export type Rotation = {
   status: string;
   suitability: RotationSuitability;
   insight: string;
-  rotationCropZnMgKg: number;
-  nextWheatZnMgKg: number;
 };
 export type PostWheatConditions = {
   temp_c: number;
   rain_mm: number;
   root_zone_moisture_pct: number;
-  zn_bioavailability_index: number;
 };
 export type District = {
   id: string;

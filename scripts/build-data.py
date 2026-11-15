@@ -72,7 +72,7 @@ def main(climate_path: str, crop_path: str) -> None:
 
         rows = crops[crops.District == name]
         for column in ["Agro_Zone", "PostWheat_Air_Temp_C", "PostWheat_Rainfall_mm",
-                       "RootZone_Moisture_pct", "Zn_Bioavailability_Index"]:
+                       "RootZone_Moisture_pct"]:
             if rows[column].nunique() != 1:
                 raise SystemExit(f"{name}: {column} differs between crop-rotation rows.")
         first = rows.iloc[0]
@@ -89,7 +89,6 @@ def main(climate_path: str, crop_path: str) -> None:
                 "temp_c": float(first.PostWheat_Air_Temp_C),
                 "rain_mm": float(first.PostWheat_Rainfall_mm),
                 "root_zone_moisture_pct": float(first.RootZone_Moisture_pct),
-                "zn_bioavailability_index": float(first.Zn_Bioavailability_Index),
             },
             "monthly": monthly,
             "rotations": [{
@@ -97,8 +96,6 @@ def main(climate_path: str, crop_path: str) -> None:
                 "status": r.Suitability_Status,
                 "suitability": suitability(r.Suitability_Status),
                 "insight": r.Agronomic_Insight,
-                "rotationCropZnMgKg": float(r.Predicted_Rotation_Crop_Zn_mg_kg),
-                "nextWheatZnMgKg": float(r.Predicted_Next_Wheat_Zn_mg_kg),
             } for r in rows.itertuples(index=False)],
         })
 
