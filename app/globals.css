@@ -105,6 +105,25 @@ footer i {
     color: #12221b
 }
 
+.location-name {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px
+}
+
+.district-name-urdu {
+    direction: rtl;
+    unicode-bidi: isolate;
+    font-family: "Noto Nastaliq Urdu", "Noto Naskh Arabic", serif
+}
+
+.location-name .district-name-urdu {
+    color: #617268;
+    font-size: 13px
+}
+
 .location-button svg:first-child {
     color: #08784f
 }
@@ -151,7 +170,21 @@ footer i {
     padding: 9px;
     border-radius: 7px;
     display: flex;
-    justify-content: space-between
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px
+}
+
+.location-option-name {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px
+}
+
+.location-option-name .district-name-urdu {
+    font-size: 13px;
+    color: #617268
 }
 
 .location-menu li button.active,
@@ -220,7 +253,14 @@ footer i {
     text-transform: uppercase;
     display: inline-flex;
     align-items: center;
-    gap: 5px
+    gap: 5px;
+    flex-wrap: wrap
+}
+
+.hero-location .district-name-urdu {
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 14px
 }
 
 .dashboard-shell {
@@ -542,6 +582,12 @@ footer i {
     font-size: 11px
 }
 
+.map-label>span {
+    display: flex;
+    align-items: center;
+    gap: 5px
+}
+
 .map-label svg {
     color: #ef9b22
 }
@@ -735,7 +781,7 @@ footer>svg {
         padding: 11px
     }
 
-    .location-button span {
+    .location-button>.location-name {
         display: none
     }
 

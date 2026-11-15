@@ -8,7 +8,7 @@ The platform provides two independent levels of assessment. Users can explore di
 
 ### 1. Explore environmental conditions
 
-Select one of 34 Punjab districts to view the supplied monthly rainfall, air temperature, surface and root-zone soil moisture, evapotranspiration, and soil-temperature data. The available time series covers November 2023 through October 2026. A district map provides geographic context and lets users change the selected district.
+Select one of 34 Punjab districts to view the supplied monthly rainfall, air temperature, surface and root-zone soil moisture, evapotranspiration, and soil-temperature data. District names are shown in English and Urdu. The available time series covers November 2023 through October 2026. A district map provides geographic context and lets users change the selected district.
 
 These indicators provide environmental context for wheat cultivation. They do not directly measure soil zinc, plant uptake, or grain zinc.
 
@@ -32,6 +32,7 @@ The assessment gives each entered value a low, moderate, or high screening label
 ## Features
 
 - District selector and map for the 34 districts represented in the supplied data.
+- District names displayed in both English and Urdu.
 - Monthly environmental charts and yearly summaries, including evapotranspiration.
 - Crop-rotation options, workbook-provided suitability and agronomic notes, and source-provided modeled zinc values.
 - Independent soil-test screening that accepts any subset of the four supported lab values.

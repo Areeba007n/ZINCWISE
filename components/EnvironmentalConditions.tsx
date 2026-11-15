@@ -5,6 +5,7 @@ import { CloudRain, Droplets, Sun, Thermometer } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { monthNames } from "@/lib/data";
 import type { District, MonthlyReading } from "@/lib/types";
+import { getUrduDistrictName } from "@/lib/district-names";
 import { Panel } from "./ui";
 
 type ChartReading = MonthlyReading & { monthLabel: string };
@@ -57,7 +58,7 @@ export function EnvironmentalConditions({ district }: { district: District }) {
       <div className="year-tabs" aria-label="Select data year">
         {years.map((value) => <button key={value} onClick={() => setSelectedYear(value)} className={year === value ? "selected" : ""}>{value}</button>)}
       </div>
-      <span className="period-note">{district.name} · {monthNames[first.month - 1]}–{monthNames[last.month - 1]} {year}</span>
+      <span className="period-note">{district.name} <span className="district-name-urdu" lang="ur" dir="rtl">{getUrduDistrictName(district.id)}</span> · {monthNames[first.month - 1]}–{monthNames[last.month - 1]} {year}</span>
     </div>
     <div className="charts">
       <MiniChart title="Rainfall (mm)" data={data} series={[{ key: "rain_mm", name: "Rainfall", color: "#2684c7" }]} unit="mm" bar />
