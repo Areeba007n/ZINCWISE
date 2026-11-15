@@ -1,6 +1,36 @@
-export type Risk = "high" | "moderate" | "low";
-export type MonthlyReading = { year: number; month: number; rain_mm: number; temp_c: number; soil_moisture_pct: number };
-export type Soil = { ph: number; organic_carbon_pct: number; clay_pct: number; zinc_mg_kg: number };
-export type Rotation = { name: string; tag: "Baseline" | "Recommended" | "Alternative"; description: string };
-export type Insight = { title: string; text: string };
-export type District = { id: string; name: string; region: string; lat: number; lng: number; monthly: MonthlyReading[]; soil: Soil; zinc_risk: Risk; rotations: Rotation[]; insights: Insight[] };
+export type MonthlyReading = {
+  year: number;
+  month: number;
+  rain_mm: number;
+  temp_c: number;
+  surface_moisture_pct: number;
+  root_zone_moisture_pct: number;
+  evapotranspiration_mm_day: number;
+  soil_temp_c: number;
+};
+export type RotationSuitability = "high" | "moderate" | "low";
+export type Rotation = {
+  name: string;
+  status: string;
+  suitability: RotationSuitability;
+  insight: string;
+  rotationCropZnMgKg: number;
+  nextWheatZnMgKg: number;
+};
+export type PostWheatConditions = {
+  temp_c: number;
+  rain_mm: number;
+  root_zone_moisture_pct: number;
+  zn_bioavailability_index: number;
+};
+export type District = {
+  id: string;
+  name: string;
+  zone: string;
+  zoneType: string;
+  lat: number;
+  lng: number;
+  postWheat: PostWheatConditions;
+  monthly: MonthlyReading[];
+  rotations: Rotation[];
+};

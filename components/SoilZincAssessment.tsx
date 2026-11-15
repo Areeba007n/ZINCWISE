@@ -1,9 +1,77 @@
 "use client";
-import { useEffect, useState } from "react";
-import { AlertTriangle, FlaskConical, RotateCcw, Sprout } from "lucide-react";
-import { assessZinc } from "@/lib/zinc";
-import type { Soil } from "@/lib/types";
+
+import { useState } from "react";
+import { AlertTriangle, FlaskConical, Microscope, RotateCcw } from "lucide-react";
+import { assessZinc, SOIL_KEYS, type SoilInput, type SoilKey } from "@/lib/zinc";
 import { Panel, StatusChip } from "./ui";
-const labels: { key: keyof Soil; name: string; suffix: string }[] = [{ key: "ph", name: "Soil pH", suffix: "" }, { key: "organic_carbon_pct", name: "Organic Carbon", suffix: "%" }, { key: "clay_pct", name: "Clay Content", suffix: "%" }, { key: "zinc_mg_kg", name: "Soil Zinc (est.)", suffix: "mg/kg" }];
-export function SoilZincAssessment({ regionalSoil }: { regionalSoil: Soil }) { const [labMode, setLabMode] = useState(false); const [soil, setSoil] = useState<Soil>(regionalSoil); const [draft, setDraft] = useState<Soil>(regionalSoil); const [error, setError] = useState(""); useEffect(() => { setSoil(regionalSoil); setDraft(regionalSoil); setLabMode(false); setError(""); }, [regionalSoil]); const assessment = assessZinc(soil); const setValue = (key: keyof Soil, value: string) => setDraft((old) => ({ ...old, [key]: Number(value) })); const submit = (e: React.FormEvent) => { e.preventDefault(); const valid = draft.ph >= 0 && draft.ph <= 14 && draft.organic_carbon_pct >= 0 && draft.organic_carbon_pct <= 20 && draft.clay_pct >= 0 && draft.clay_pct <= 100 && draft.zinc_mg_kg >= 0 && draft.zinc_mg_kg <= 50; setError(valid ? "" : "Please enter values within the displayed scientific ranges."); if (valid) setSoil(draft); };
-  return <Panel className="soil-panel" label="Soil and zinc assessment"><div className="panel-heading"><span className="heading-icon sprout"><Sprout /></span><h2>Soil &amp; Zinc Assessment</h2></div><div className="assessment-tools"><button className="lab-button" onClick={() => setLabMode((value) => !value)}><FlaskConical size={15}/>{labMode ? "Hide lab results" : "I have lab test results"}</button>{labMode && <button className="reset-button" onClick={() => { setSoil(regionalSoil); setDraft(regionalSoil); setLabMode(false); setError(""); }}><RotateCcw size={14}/> Reset</button>}</div>{labMode ? <form onSubmit={submit} className="lab-form">{labels.map(({ key, name, suffix }) => <label key={key}>{name}<span><input type="number" required step="any" value={draft[key]} onChange={(e) => setValue(key, e.target.value)} aria-label={name}/>{suffix && <em>{suffix}</em>}</span></label>)}{error && <p className="form-error">{error}</p>}<button className="submit-lab" type="submit">Update assessment</button></form> : <dl className="soil-values">{labels.map(({ key, name, suffix }) => <div key={key}><dt>{name}</dt><dd>{key === "zinc_mg_kg" ? "~ " : ""}{soil[key]} {suffix}</dd>{key !== "zinc_mg_kg" && <StatusChip tone={key === "ph" ? "high" : "moderate"}>{key === "ph" ? "High" : "Moderate"}</StatusChip>}</div>)}</dl>}<div className={`concern concern-${assessment.tone}`}><AlertTriangle size={28}/><div><strong>{assessment.risk === "low" ? "Zinc Conditions Look Favourable" : assessment.risk === "moderate" ? "Possible Zinc Concern" : "Potential Zinc Concern"}</strong><p>{assessment.message}</p></div></div></Panel>; }
+
+const fields: Record<SoilKey, { name: string; unit: string; max: number; step: string }> = {
+  ph: { name: "Soil pH", unit: "pH", max: 14, step: "0.1" },
+  organic_carbon_pct: { name: "Organic Carbon", unit: "%", max: 20, step: "0.01" },
+  clay_pct: { name: "Clay Content", unit: "%", max: 100, step: "0.1" },
+  zinc_mg_kg: { name: "Extractable Zinc (DTPA)", unit: "mg/kg", max: 50, step: "0.01" },
+};
+const chipTone = { none: "low", watch: "moderate", attention: "high" } as const;
+
+type Draft = Record<SoilKey, string>;
+const emptyDraft: Draft = { ph: "", organic_carbon_pct: "", clay_pct: "", zinc_mg_kg: "" };
+
+export function SoilZincAssessment() {
+  const [draft, setDraft] = useState<Draft>(emptyDraft);
+  const [soil, setSoil] = useState<SoilInput | null>(null);
+  const [error, setError] = useState("");
+
+  const submit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const entered = SOIL_KEYS.filter((key) => draft[key].trim() !== "");
+    const values: SoilInput = Object.fromEntries(entered.map((key) => [key, Number(draft[key])]));
+    const valid = entered.length > 0 && entered.every((key) => Number.isFinite(values[key]) && values[key]! >= 0 && values[key]! <= fields[key].max);
+    if (!valid) {
+      setError(entered.length ? "Enter each value within its allowed range." : "Enter at least one laboratory value.");
+      setSoil(null);
+      return;
+    }
+    setError("");
+    setSoil(values);
+  };
+  const reset = () => {
+    setDraft(emptyDraft);
+    setSoil(null);
+    setError("");
+  };
+  const assessment = soil ? assessZinc(soil) : null;
+
+  return <Panel className="soil-panel" label="Independent lab soil assessment">
+    <div className="panel-heading"><span className="heading-icon sprout"><FlaskConical /></span><h2>Soil &amp; Zinc Assessment</h2></div>
+    <p className="soil-intro">Enter values from your soil laboratory report (leave blank anything you don’t have). This analysis is independent of the selected district.</p>
+    <form onSubmit={submit} className="soil-form">
+      {SOIL_KEYS.map((key) => <label key={key}>
+        {fields[key].name}<span><input
+          type="number"
+          inputMode="decimal"
+          min="0"
+          max={fields[key].max}
+          step={fields[key].step}
+          value={draft[key]}
+          onChange={(event) => setDraft((current) => ({ ...current, [key]: event.target.value }))}
+        /><em>{fields[key].unit}</em></span>
+      </label>)}
+      {error && <p className="form-error" role="alert">{error}</p>}
+      <button className="submit-lab" type="submit"><Microscope size={15} aria-hidden="true" />Get Deeper Analysis</button>
+      {(assessment || SOIL_KEYS.some((key) => draft[key])) && <button className="reset-button" type="button" onClick={reset}><RotateCcw size={13} aria-hidden="true" />Clear lab results</button>}
+    </form>
+    {assessment && <div className={`soil-analysis concern concern-${assessment.tone}`} aria-live="polite">
+      <AlertTriangle size={22} />
+      <div className="soil-analysis-content">
+        <strong>{assessment.title}</strong>
+        <div className="soil-findings">{assessment.findings.map((finding) => <article key={finding.key}>
+          <div><b>{finding.name}</b><span>{finding.value} {finding.unit}</span><StatusChip tone={chipTone[finding.concern]}>{finding.label}</StatusChip></div>
+          <p>{finding.message}</p>
+          <small>Reference: {finding.reference}</small>
+        </article>)}</div>
+        {assessment.insights.length > 0 && <ul className="key-findings">{assessment.insights.map((text) => <li key={text}>{text}</li>)}</ul>}
+        <small>Screening guidance based on general reference ranges; confirm with your laboratory’s interpretation and a local agronomist.</small>
+      </div>
+    </div>}
+  </Panel>;
+}
